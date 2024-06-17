@@ -8,7 +8,7 @@ from sqlalchemy.sql import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from lib.models import User
-from lib.schemas import UserSchema, ErrorResponseSchema
+from lib.schemas import UserSchema, ErrorResponseSchema, UserRegisterSchema
 from lib.database import create_tables, drop_tables, get_db
 
 
@@ -60,7 +60,7 @@ async def get_all_users(db: AsyncSession = Depends(get_db)):
         404: {"model": ErrorResponseSchema, "description": "User not found"},
     },
 )
-async def get_user(user_id: int, db: AsyncSession = Depends(get_db)):
+async def get_a_user(user_id: int, db: AsyncSession = Depends(get_db)):
     query = select(User).where(User.id == user_id)
     result = await db.execute(query)
     user = result.scalars().first()
@@ -73,4 +73,31 @@ async def get_user(user_id: int, db: AsyncSession = Depends(get_db)):
         height=user.height,
         weight=user.weight,
         age=user.age,
+    )
+
+
+@app.post(
+    "/users",
+    responses={
+        201: {"model": UserSchema, "description": "The user"},
+        400: {"model": ErrorResponseSchema, "description": "Invalid request"},
+    },
+)
+async def create_user(user: UserRegisterSchema, db: AsyncSession = Depends(get_db)):
+    new_user = User(
+        email=user.email,
+        name=user.name,
+        height=user.height,
+        weight=user.weight,
+        age=user.age,
+        password=user.password,
+    )
+    db.add(new_user)
+    await db.commit()
+    return UserSchema(
+        email=new_user.email,
+        name=new_user.name,
+        height=new_user.height,
+        weight=new_user.weight,
+        age=new_user.age,
     )

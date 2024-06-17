@@ -16,16 +16,18 @@ class UserLoginSchema(BaseModel):
 class UserRegisterSchema(BaseModel):
     email: str
     password: str
+    age: int
+    name: str
+    height: int
+    weight: int
 
 
 class UserDataUpdateSchema(BaseModel):
     name: Optional[str] = None
-    gender: Optional[str] = None
     height: Optional[int] = None
     weight: Optional[int] = None
     password: Optional[str] = None
     age: Optional[int] = None
-    desired_weight: Optional[int] = None
 
     # Throws an error if any extra fields are present
     class Config:
@@ -38,16 +40,3 @@ class UserSchema(BaseModel):
     name: str
     height: int
     weight: int
-
-
-class UserLoginResponseSchema(BaseModel):
-    email: str
-    access_token: str
-    name: str
-
-
-class UserRegisterResponseSchema(BaseModel):
-    email: str
-    access_token: str
-    name: str
-    message: str
